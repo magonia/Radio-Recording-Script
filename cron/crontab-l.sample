@@ -1,0 +1,43 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+
+@reboot         $HOME/.dropbox-dist/dropboxd &
+# Jissen Radio English
+15  9 * * Wed-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/English/JBE JBE
+40 12 * * Wed-Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/JBE JBE
+20 23 * * Wed-Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/JBE JBE
+# Modern English
+#40 12 * * Sat,Sun	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
+#25 22 * * Sun		$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
+#40 22 * * Sun		$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
+#00 22 * * Thu,Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
+# Everyday Chinese
+15  8 * * Mon-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
+15 22 * * Mon-Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/Chinese/ ECN
+# Ikina Yoru
+59 3 * * Sun	$HOME/bin/rec_radiko.sh TBS 61 $HOME/Dropbox/Music
+# Jazz Tonight
+00 23 * * Sat	$HOME/bin/rec_nhk.py FM 121 $HOME/Dropbox/Music JT
+# Session
+30 22 * * Sun	$HOME/bin/rec_nhk.sh FM 61 $HOME/Dropbox/Music JS
+00 10 * * Fri	$HOME/bin/rec_nhk.sh FM 61 $HOME/Dropbox/Music JS
