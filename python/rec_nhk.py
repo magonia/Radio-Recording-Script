@@ -34,7 +34,7 @@ if __name__ == '__main__':
         'FM': './/stream_url/data/fmhls'
     }
     # variables for NHK-API
-    api_key = 'KxJ5GY9jzIvokpPuJdaWN4B3F2wM9F5O'
+    api_key = 'Your API Key'
     now_base = 'http://api.nhk.or.jp/v2/pg/now/{}/{}.json?key={}'
     info_base = 'http://api.nhk.or.jp/v2/pg/info/{}/{}/{}.json?key={}'
     nhk_code = {
