@@ -34,7 +34,7 @@ if __name__ == '__main__':
         'FM': './/stream_url/data/fmhls'
     }
     # variables for NHK-API
-    api_key = 'Your API Key'
+    api_key = 'Your Api Key'
     now_base = 'http://api.nhk.or.jp/v2/pg/now/{}/{}.json?key={}'
     info_base = 'http://api.nhk.or.jp/v2/pg/info/{}/{}/{}.json?key={}'
     nhk_code = {
@@ -48,36 +48,6 @@ if __name__ == '__main__':
         'FM': u'NHK-FM'
     }
     timing = 'present'
-
-    # Parameter chech
-    args = sys.argv
-    if len(args) == 1:
-        print( 
-        'usage : ' + args[0] + 
-        ' channel_name duration(minuites) [outputdir] [prefix]' )
-        sys.exit(1)
-
-    if len(args) >= 2:
-        channel=args[1]
-        prefix=channel
-        xpath = nhk_xpath.get( channel , None )
-        if xpath is None:
-            print( "channel doesn't exist" )
-            sys.exit(1)
-        else:
-	    code = nhk_code.get( channel , None )
-
-    if len(args) >= 3 and args[2].isdigit():
-        duration=int( args[2] ) * 60
-    else:
-        print 'duration must be digit.'
-        sys.exit(1)
-
-    if len(args) >= 4:
-        outdir=args[3]
-
-    if len(args) >= 5:
-        timing = 'present'
 
     # Parameter chech
     args = sys.argv
