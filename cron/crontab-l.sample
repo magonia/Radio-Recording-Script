@@ -1,3 +1,4 @@
+PYTHONPATH=/home/naka-h/bin
 # Edit this file to introduce tasks to be run by cron.
 # 
 # Each task to run has to be defined through a single line
@@ -21,23 +22,26 @@
 # 
 # m h  dom mon dow   command
 
+# Exec dropboxd when reboot
 @reboot         $HOME/.dropbox-dist/dropboxd &
 # Jissen Radio English
-15  9 * * Wed-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/English/JBE JBE
-40 12 * * Wed-Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/JBE JBE
-20 23 * * Wed-Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/JBE JBE
-# Modern English
-#40 12 * * Sat,Sun	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
-#25 22 * * Sun		$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
-#40 22 * * Sun		$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
-#00 22 * * Thu,Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/English/ME ME
+15  9 * * Wed-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/English JBE
+40 12 * * Wed-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/English JBE
+20 23 * * Wed-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/English JBE
 # Everyday Chinese
 15  8 * * Mon-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
-15 22 * * Mon-Fri	$HOME/bin/rec_nhk.sh NHK2 16 $HOME/Dropbox/Chinese/ ECN
+15 22 * * Mon-Fri	$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
+00 11 * * Sun		$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
+15 11 * * Sun		$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
+30 11 * * Sun		$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
+45 11 * * Sun		$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
+00 12 * * Sun		$HOME/bin/rec_nhk.py NHK2 16 $HOME/Dropbox/Chinese/ ECN
 # Ikina Yoru
-59 3 * * Sun	$HOME/bin/rec_radiko.sh TBS 61 $HOME/Dropbox/Music
+00 4 * * Sun	$HOME/bin/rec_radiko.py TBS 61 $HOME/Dropbox/Music
 # Jazz Tonight
 00 23 * * Sat	$HOME/bin/rec_nhk.py FM 121 $HOME/Dropbox/Music JT
+# Taste of Jazz
+00 18 * * Sat	$HOME/bin/rec_radiko.py RN1 31 $HOME/Dropbox/Music TJ
 # Session
-30 22 * * Sun	$HOME/bin/rec_nhk.sh FM 61 $HOME/Dropbox/Music JS
-00 10 * * Fri	$HOME/bin/rec_nhk.sh FM 61 $HOME/Dropbox/Music JS
+#30 22 * * Sun	$HOME/bin/rec_nhk.py FM 61 $HOME/Dropbox/Music JS
+#00 10 * * Fri	$HOME/bin/rec_nhk.py FM 61 $HOME/Dropbox/Music JS
