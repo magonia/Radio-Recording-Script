@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
+import argparse
 import os
 import sys
 import subprocess
@@ -135,49 +136,88 @@ def get_streamurl( channel ):
     url_parts.append( stream_url.split( '://' )[1].split( '/' )[3] )
     return url_parts
 
+def live_rec( url_parts, playerurl, auth_token, prefix, duration, date, outdir ):
+    rtmpdump='/usr/bin/rtmpdump'
+    ffmpeg='/usr/bin/ffmpeg'
+    # Recording...
+    cmd = '{} -q'.format( rtmpdump )
+    cmd = cmd + ' -r {}'.format( url_parts[0] )
+    cmd = cmd + ' --app {}'.format( url_parts[1] )
+    cmd = cmd + ' --playpath {}'.format( url_parts[2] )
+    cmd = cmd + ' -W {} -C S:"" -C S:"" -C S:""'.format( playerurl )
+    cmd = cmd + ' -C S:{}'.format( auth_token )
+    cmd = cmd + ' --live --stop {}'.format( duration )
+    path = '{}/{}_{}'
+    cmd = cmd + ' --flv ' + path.format( '/tmp', prefix, date )
+    # Exec rtpmdump
+    subprocess.call( cmd.strip().split(" ")  )
+
+    cmd = '{} -loglevel quiet -y'.format( ffmpeg )
+    cmd = cmd + ' -i {}'.format( path.format( '/tmp', prefix, date ) )
+    path = '{}/{}_{}.mp3'.format( outdir, prefix, date )
+    cmd = cmd + ' -acodec libmp3lame -ab 128k -vn {}'.format( path )
+    # Exec ffmpeg
+    subprocess.call( cmd.strip().split(" ")  ) 
+    # clean up
+    path = '{}/{}_{}'
+    os.remove( path.format( '/tmp', prefix, date ) )
+
+def tf_rec( auth_token, channel, ft, to, outdir, prefix, date ):
+    ffmpeg = '/usr/bin/ffmpeg'
+    headers = ' -headers "X-Radiko-AuthToken: {}"'.format( auth_token )
+    url = ' -i "https://radiko.jp/v2/api/ts/playlist.m3u8?station_id={}&ft={}&to={}"'.format( channel, ft, to )
+    path = '{}/{}_{}.mp3'.format( outdir, prefix, date )
+
+    cmd = '{} -loglevel quiet -y'.format( ffmpeg )
+    cmd = cmd + headers + url
+    cmd = cmd + ' -acodec libmp3lame -ab 128k -vn {}'.format( path )
+    # Exec ffmpeg
+    subprocess.call( cmd.strip().split(" ")  ) 
+
 if __name__ == '__main__':
-    # where are you?
-    outdir = '.'
-    prefix = ''
+    parser=argparse.ArgumentParser( description='Recording Radiko.' )
+    parser.add_argument('channel', \
+                metavar='channel', \
+                help=' Channel Name' )
+    parser.add_argument('duration', \
+                metavar='duration', \
+                type=int, \
+                help='Duration(minutes)' )
+    parser.add_argument('outputdir', \
+                metavar='outputdir', \
+                nargs='?', \
+                default='.' , \
+                help='Output path default:\'.\'' )
+    parser.add_argument('prefix', \
+                metavar='Prefix name',\
+                nargs='?', \
+                help='Prefix name for output file.' )
+    parser.add_argument('-tf', '--timefree', \
+                metavar='timefree id', \
+                nargs=1, \
+                default=None, \
+                help='Time Free Progam ID' )
+    args = parser.parse_args()
+    channel=args.channel
+    duration=args.duration * 60
+    outdir=args.outputdir
+
+    if args.prefix is None:
+        prefix=args.channel
+    else:
+        prefix=args.prefix
+
     # variables
     pid  = os.getpid()
-
-    # Parameter chech
-    args = sys.argv
-    if len(args) == 1:
-        print( 
-        'usage : ' + args[0] + 
-        ' channel_name duration(minuites) [outputdir] [prefix]' )
-        sys.exit(1)
-
-    if len(args) >= 2:
-        channel=args[1]
-        prefix=channel
-
-    if len(args) >= 3 and args[2].isdigit():
-        duration=int( args[2] ) * 60
-    else:
-        print 'duration must be digit.'
-        sys.exit(1)
-
-    if len(args) >= 4:
-        outdir=args[3]
-
-    if len(args) >= 5:
-        prefix=args[4]
-
     # setting date
     date = DT.now()
     date = date.strftime('%Y-%m-%d-%H_%M')
-
     #playerurl='http://radiko.jp/player/swf/player_3.0.0.01.swf'
     #playerurl='http://radiko.jp/player/swf/player_4.1.0.00.swf'
     playerurl='http://radiko.jp/apps/js/flash/myplayer-release.swf'
     playerfile="/tmp/player.{}.swf".format( date )
     keyfile="/tmp/authkey.{}.png".format( date )
     swfextract='/usr/bin/swfextract'
-    rtmpdump='/usr/bin/rtmpdump'
-    ffmpeg='/usr/bin/ffmpeg'
 
     # get player file
     get_player( playerfile, playerurl )
@@ -201,60 +241,35 @@ if __name__ == '__main__':
         exit(1)
 
     # get program meta via radiko api
-    program.get_now( channel )
-    #print 'title:' + program.title[0].text
-    #print 'url:' + program.url[0].text
-    #print 'desc:' + program.desc[0].text
-    #print 'info:' + program.info[0].text
-    #print 'artist:' + program.pfm[0].text
-    #print 'image:' + program.img[0].text
-
-    # get program meta via radiko api
     url_parts = get_streamurl( channel )
 
-    # Recording...
-    cmd = '{} -q'.format( rtmpdump )
-    cmd = cmd + ' -r {}'.format( url_parts[0] )
-    cmd = cmd + ' --app {}'.format( url_parts[1] )
-    cmd = cmd + ' --playpath {}'.format( url_parts[2] )
-    cmd = cmd + ' -W {} -C S:"" -C S:"" -C S:""'.format( playerurl )
-    cmd = cmd + ' -C S:{}'.format( auth_token )
-    cmd = cmd + ' --live --stop {}'.format( duration )
-    path = '{}/{}_{}'
-    cmd = cmd + ' --flv ' + path.format( '/tmp', prefix, date )
-
-    # Exec rtpmdump
-    subprocess.call( cmd.strip().split(" ")  ) 
-
-    cmd = '{} -loglevel quiet -y'.format( ffmpeg )
-    cmd = cmd + ' -i {}'.format( path.format( '/tmp', prefix, date ) )
-    path = '{}/{}_{}.mp3'
-    cmd = cmd + ' -acodec libmp3lame -ab 128k {}'.format( path.format( outdir, prefix, date ) )
-    # Exec ffmpeg
-    subprocess.call( cmd.strip().split(" ")  ) 
+    if args.timefree is None:
+        index = 1
+        live_rec( url_parts, playerurl, auth_token, prefix, \
+                duration, date, outdir )
+    else:
+        index = 0
+        tf_rec( auth_token, channel, ft, to, outdir, prefix, date )
 
     # clean up
-    path = '{}/{}_{}'
-    os.remove( path.format( '/tmp', prefix, date ) )
     os.remove( keyfile )
-    #print playerfile
-    #os.remove( playerfile )
 
     #
     # set program meta by mutagen
     #
+    program.get_now( channel )
     path = '{}/{}_{}.mp3'.format( outdir, prefix, date )
     tags = EasyID3(path)
     tags['album'] = channel
-    if program.title[0] is not None:
-        tags['title'] = program.title[0].text
-    if program.pfm[0] is not None:
-        tags['artist'] = program.pfm[0].text
+    if program.title[index].text is not None:
+        tags['title'] = program.title[index].text
+    if program.pfm[index].text is not None:
+        tags['artist'] = program.pfm[index].text
 
     tags.save()
 
-    if program.img[0] is not None:
-        logo_url = program.img[0].text
+    if program.img[index].text is not None:
+        logo_url = program.img[index].text
         coverart = urllib2.urlopen(logo_url).read()
         audio = MP3(path)
         audio.tags.add(
@@ -266,4 +281,3 @@ if __name__ == '__main__':
         audio.save()
 
     #show_id3_tags(path)
-
